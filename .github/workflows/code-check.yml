@@ -1,0 +1,84 @@
+name: Code quality check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+
+concurrency:
+  group: ci-check-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CI: true
+
+jobs:
+  setup:
+    if: github.event.pull_request.draft != true
+    runs-on: ubuntu-latest
+    outputs:
+      paths-node_modules: ${{ steps.paths-node_modules.outputs.paths }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Cache node_modules
+        uses: actions/cache@v3
+        id: cache-node_modules
+        with:
+          key: node_modules-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
+          path: node_modules
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        id: setup-node
+        with:
+          node-version-file: .nvmrc
+      - name: Installing dependencies with yarn
+        if: steps.cache-node_modules.outputs.cache-hit != 'true'
+        run: |
+          yarn install --frozen-lockfile
+      - name: Ensure GIT is clean after everything is done
+        uses: numtide/clean-git-action@v1
+        if: steps.cache-node_modules.outputs.cache-hit != 'true'
+
+  check-app:
+    if: github.event.pull_request.draft != true
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Fetch node_modules
+        uses: actions/cache@v3
+        id: fetch-node_modules
+        with:
+          key: node_modules-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
+          path: node_modules
+      - uses: actions/setup-node@v3
+        with:
+          node-version-file: .nvmrc
+      - name: Run eslint
+        run: yarn lint
+
+  build:
+    if: github.event.pull_request.draft != true
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Fetch node_modules
+        uses: actions/cache@v3
+        id: fetch-node_modules
+        with:
+          key: node_modules-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
+          path: node_modules
+      - uses: actions/setup-node@v3
+        id: setup-node
+        with:
+          node-version-file: .nvmrc
+      - name: Run build
+        run: yarn build
+      - name: Ensure GIT is clean after everything is done
+        uses: numtide/clean-git-action@v1
