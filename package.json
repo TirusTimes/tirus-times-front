@@ -16,7 +16,7 @@
     "@mui/material": "^5.10.10",
     "@mui/styled-engine-sc": "^5.10.6",
     "@mui/icons-material": "^5.10.6",
-    "@mui/lab": "5.0.0-alpha.101",
+    "@mui/lab": "5.0.0-alpha.105",
     "@mui/system": "^5.10.7",
     "@mui/x-data-grid": "^5.17.4",
     "react": "^18.2.0",
