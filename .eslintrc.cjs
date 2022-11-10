@@ -66,7 +66,7 @@ module.exports = {
     ],
     '@typescript-eslint/no-use-before-define': 'warn',
     '@typescript-eslint/no-floating-promises': 'error',
-    '@typescript-eslint/no-misused-promises': 'error',
+    '@typescript-eslint/no-misused-promises': 'warn',
     'filenames/match-exported': ['error', [null, 'kebab']],
     'import/extensions': [
       'error',
@@ -158,6 +158,10 @@ module.exports = {
     'import/resolver': {
       'babel-module': {
         extensions: ['.ts', '.tsx', '.js', '.jsx'],
+      },
+      node: {
+        extensions: ['.js', '.jsx', '.ts', '.tsx'],
+        moduleDirectory: ['node_modules', 'src/'],
       },
     },
   },
