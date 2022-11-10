@@ -2,6 +2,8 @@ import { useState } from 'react';
 import type { AlertColor } from '@mui/material';
 import { Alert, Snackbar } from '@mui/material';
 
+import SignUpForm from 'components/SignUpForm';
+
 import { Background, Container } from './styles';
 
 const SignUp = (): JSX.Element => {
@@ -35,6 +37,8 @@ const SignUp = (): JSX.Element => {
           {snackbar.message}
         </Alert>
       </Snackbar>
+
+      <SignUpForm setSnackbar={setSnackbar} />
     </Container>
   );
 };
