@@ -1,6 +1,6 @@
 import { Typography } from '@mui/material';
 
-import { Background, Container, Main, Nav, StyledButton } from './style';
+import { Background, Container, Main, Nav, StyledButton } from './styles';
 
 const Home = (): JSX.Element => {
   return (
@@ -13,7 +13,7 @@ const Home = (): JSX.Element => {
           <StyledButton href="/login" variant="outlined">
             Login
           </StyledButton>
-          <StyledButton href="/register" variant="outlined">
+          <StyledButton href="/signup" variant="outlined">
             Cadastro
           </StyledButton>
         </div>
