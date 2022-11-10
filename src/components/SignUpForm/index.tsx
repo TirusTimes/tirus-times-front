@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 
 import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -50,21 +50,24 @@ const SignUpForm: React.FC<ISignUpForm> = ({ setSnackbar }) => {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState(INITIAL_DATA);
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
+  const handleChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>): void => {
+      setFormData(curr => ({
+        ...curr,
+        [event.target.name]: event.target.value || '',
+      }));
+    },
+    [],
+  );
+
+  const handleChangeSelect = useCallback((event: SelectChangeEvent): void => {
     setFormData(curr => ({
       ...curr,
       [event.target.name]: event.target.value || '',
     }));
-  };
+  }, []);
 
-  const handleChangeSelect = (event: SelectChangeEvent): void => {
-    setFormData(curr => ({
-      ...curr,
-      [event.target.name]: event.target.value || undefined,
-    }));
-  };
-
-  const handleSubmit = async (): Promise<void> => {
+  const handleSubmit = useCallback(async (): Promise<void> => {
     setLoading(true);
     try {
       validateString(formData.name, 'Nome');
@@ -101,7 +104,7 @@ const SignUpForm: React.FC<ISignUpForm> = ({ setSnackbar }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [formData, navigate, setSnackbar]);
 
   return (
     <Main>
