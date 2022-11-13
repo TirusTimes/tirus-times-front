@@ -1,6 +1,7 @@
 import type { ReactElement } from 'react';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { SnackbarProvider } from 'notistack';
 
 import { makeServer } from './server';
 import Theme from './theme';
@@ -19,7 +20,9 @@ const root = ReactDOM.createRoot(document.getElementById('root')!);
 const AppContainer = (): ReactElement => (
   <React.StrictMode>
     <Theme>
-      <Routes />
+      <SnackbarProvider maxSnack={1} autoHideDuration={5000}>
+        <Routes />
+      </SnackbarProvider>
     </Theme>
   </React.StrictMode>
 );
