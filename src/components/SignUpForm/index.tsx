@@ -20,6 +20,8 @@ import {
   Typography,
 } from '@mui/material';
 
+import { useSnackbar } from 'notistack';
+
 import { validateString } from 'utils/validate-string';
 
 import { Main, Tips, ButtonsContainer, StyledButton } from './styles';
@@ -34,19 +36,9 @@ const INITIAL_DATA = {
   expertise: '',
 };
 
-interface ISignUpForm {
-  setSnackbar: (
-    value: React.SetStateAction<{
-      open: boolean;
-      message: string;
-      severity: string;
-    }>,
-  ) => void;
-}
-
-const SignUpForm: React.FC<ISignUpForm> = ({ setSnackbar }) => {
+const SignUpForm: React.FC = () => {
   const navigate = useNavigate();
-
+  const { enqueueSnackbar } = useSnackbar();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState(INITIAL_DATA);
 
@@ -80,12 +72,12 @@ const SignUpForm: React.FC<ISignUpForm> = ({ setSnackbar }) => {
       const response = await axios.post('/api/signup', formData);
 
       if (response.data) {
-        setSnackbar(curr => ({
-          ...curr,
-          open: true,
-          severity: 'success',
-          message: 'Usuário criado com sucesso! Você será redirecionado agora!',
-        }));
+        enqueueSnackbar(
+          'Usuário criado com sucesso! Você será redirecionado agora!',
+          {
+            variant: 'success',
+          },
+        );
 
         setFormData(INITIAL_DATA);
 
@@ -95,16 +87,13 @@ const SignUpForm: React.FC<ISignUpForm> = ({ setSnackbar }) => {
       }
     } catch (error) {
       const err = error as AxiosError;
-      setSnackbar(curr => ({
-        ...curr,
-        open: true,
-        severity: 'error',
-        message: err?.message || 'Ops, algo deu errado...',
-      }));
+      enqueueSnackbar(err?.message || 'Ops, algo deu errado...', {
+        variant: 'error',
+      });
     } finally {
       setLoading(false);
     }
-  }, [formData, navigate, setSnackbar]);
+  }, [enqueueSnackbar, formData, navigate]);
 
   return (
     <Main>
