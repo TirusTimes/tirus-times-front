@@ -3,12 +3,16 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { SnackbarProvider } from 'notistack';
 
+import { setupAxios } from 'services';
+
 import { makeServer } from './server';
 import Theme from './theme';
 
 import Routes from './routes';
 
 import './styles.css';
+
+setupAxios();
 
 if (process.env.NODE_ENV === 'development') {
   makeServer({ environment: 'development' });
