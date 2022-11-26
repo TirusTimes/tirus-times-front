@@ -5,11 +5,14 @@ import type {
   AxiosResponse,
 } from 'axios';
 
+import Logging from 'services/logging';
+
 const onRequest = (config: AxiosRequestConfig): AxiosRequestConfig => {
   return config;
 };
 
 const onRequestError = (error: AxiosError): Promise<AxiosError> => {
+  Logging.logError(error);
   return Promise.reject(error);
 };
 
@@ -18,6 +21,7 @@ const onResponse = (response: AxiosResponse): AxiosResponse => {
 };
 
 const onResponseError = (error: AxiosError): Promise<AxiosError> => {
+  Logging.logError(error);
   return Promise.reject(error);
 };
 
