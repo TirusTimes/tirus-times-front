@@ -1,6 +1,9 @@
 import { Typography, Stack, Container } from '@mui/material';
-import type { ReactNode } from 'react';
+import type { ErrorInfo, ReactNode } from 'react';
 import { Component } from 'react';
+
+import type { Extras } from 'services/logging';
+import Logging from 'services/logging';
 
 import { isDevMode } from 'utils';
 
@@ -51,6 +54,10 @@ class ErrorBoundary extends Component<Props, State> {
 
   public static getDerivedStateFromError(error: Error): State {
     return { error };
+  }
+
+  public componentDidCatch(error: Error, info: ErrorInfo): void {
+    Logging.logError(error, info as unknown as Extras);
   }
 
   public render(): ReactNode {

@@ -7,10 +7,13 @@ import {
   Navigate,
 } from 'react-router-dom';
 
+import { withSentryReactRouterV6Routing, withProfiler } from '@sentry/react';
+
 import { createLazyComponents } from 'components/LazyComponent';
 
 import Route, { routesInfo } from './Route';
 
+const SentryRoutes = withSentryReactRouterV6Routing(RoutesContainer);
 const lazyRoutes = createLazyComponents({
   [Route.SIGNUP]: () => import('./SignUp'),
   [Route.ROOT]: () => import(`./Home`),
@@ -36,15 +39,15 @@ const Routes = (): JSX.Element => {
 
   return (
     <Router>
-      <RoutesContainer>
+      <SentryRoutes>
         {routes}
         <RouterRoute
           path={Route.UNKNOWN_ROUTE}
           element={redirectToNotFound()}
         />
-      </RoutesContainer>
+      </SentryRoutes>
     </Router>
   );
 };
 
-export default Routes;
+export default withProfiler(Routes);
