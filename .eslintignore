@@ -2,3 +2,4 @@ node_modules
 jest.config.js
 src/vite-env.d.ts
 .eslintrc.js
+commitlint.config.cjs
