@@ -16,6 +16,7 @@ import Route, { routesInfo } from './Route';
 const SentryRoutes = withSentryReactRouterV6Routing(RoutesContainer);
 const lazyRoutes = createLazyComponents({
   [Route.SIGNUP]: () => import('./SignUp'),
+  [Route.LOGIN]: () => import('./SignIn'),
   [Route.ROOT]: () => import(`./Home`),
   [Route.NOT_FOUND]: () => import(`./NotFound`),
 });
