@@ -18,6 +18,7 @@ const lazyRoutes = createLazyComponents({
   [Route.SIGNUP]: () => import('./SignUp'),
   [Route.LOGIN]: () => import('./SignIn'),
   [Route.ROOT]: () => import(`./Home`),
+  [Route.DASHBOARD]: () => import('./Dashboard'),
   [Route.NOT_FOUND]: () => import(`./NotFound`),
 });
 

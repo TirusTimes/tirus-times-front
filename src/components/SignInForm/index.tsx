@@ -19,6 +19,8 @@ import { useSnackbar } from 'notistack';
 
 import { validateString } from 'utils/validate-string';
 
+import Route from 'routes/Route';
+
 import { ButtonsContainer, Main, StyledButton } from './styles';
 
 const INITIAL_DATA = {
@@ -54,7 +56,7 @@ const SignInForm: React.FC = () => {
       if (response.data) {
         setFormData(INITIAL_DATA);
 
-        navigate('/dashboard');
+        navigate(Route.DASHBOARD);
       }
     } catch (error) {
       const err = error as AxiosError;
