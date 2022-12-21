@@ -1,6 +1,10 @@
-import { useMemo, useState, useCallback } from 'react';
+import { useMemo, useState, useCallback, useEffect } from 'react';
 
 import { DataGrid } from '@mui/x-data-grid';
+
+import axios from 'axios';
+
+import type { AxiosError } from 'axios';
 
 import type { GridColumns } from '@mui/x-data-grid';
 
@@ -8,11 +12,19 @@ import { Paper, ButtonBase, Fab, Box, Typography } from '@mui/material';
 
 import AddIcon from '@mui/icons-material/Add';
 
+import { useSnackbar } from 'notistack';
+
+import { useNavigate } from 'react-router-dom';
+
 import SearchBar from 'components/SearchBar';
 
 import { useModal } from 'hooks/useModal';
 
-import styles, { Nav, Main } from './styles';
+import { useToken } from 'hooks/useToken';
+
+import Route from 'routes/Route';
+
+import styles, { Nav, Main, StyledButton } from './styles';
 
 import GroupForm from './GroupForm';
 import NoRows from './NoRows';
@@ -31,24 +43,61 @@ const columns: GridColumns = columnKeys.map(column => ({
   renderCell: (params): JSX.Element => <ButtonBase>{params.value}</ButtonBase>,
 }));
 
-const groups = [
-  { id: 'auishdnas', name: 'Test' },
-  { id: 'auishdnassas', name: 'Test 2' },
-];
+interface GroupsInterface {
+  id: number;
+  name: string;
+  created_at: string;
+}
+
+interface GroupForm {
+  name: string;
+  id: number;
+}
 
 const Dashboard = (): JSX.Element => {
   const [_filter, setFilter] = useState(Constants.initialFilter);
 
   const { isOpen, handleOpen, handleClose } = useModal();
+  const { enqueueSnackbar } = useSnackbar();
+  const { wipeToken } = useToken();
+  const navigate = useNavigate();
+  const [refetch, setRefetch] = useState(false);
+
+  const [groups, setGroups] = useState<GroupsInterface[] | undefined>(
+    undefined,
+  );
 
   const [groupFormState, setGroupFormState] = useState(
-    {} as { name: string } | undefined,
+    {} as GroupForm | undefined,
   );
+
+  useEffect(() => {
+    axios
+      .get('/api/groups')
+      .then(response => {
+        setGroups(response.data);
+      })
+      .catch(error => {
+        const err = error as AxiosError;
+        enqueueSnackbar(err?.message || 'Ops, algo deu errado...', {
+          variant: 'error',
+        });
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [refetch]);
 
   const handleAddOpen = useCallback(() => {
     setGroupFormState(undefined);
     handleOpen();
   }, [setGroupFormState, handleOpen]);
+
+  const onRowClick = useCallback(
+    (data: any) => {
+      setGroupFormState(data.row);
+      handleOpen();
+    },
+    [handleOpen, setGroupFormState],
+  );
 
   const handleSearch = useCallback((searchText: string): void => {
     const newFilter =
@@ -62,8 +111,12 @@ const Dashboard = (): JSX.Element => {
     setFilter(Constants.initialFilter);
   }, []);
 
+  const handleRefetch = useCallback(() => {
+    setRefetch(prev => !prev);
+  }, []);
+
   const setGroupFormStateHandler = useCallback(
-    (newFormState: { name: string } | undefined) => {
+    (newFormState: GroupForm | undefined) => {
       setGroupFormState(newFormState);
     },
     [],
@@ -71,20 +124,26 @@ const Dashboard = (): JSX.Element => {
 
   const rows = useMemo(
     () =>
-      groups.map(group => {
+      groups?.map(group => {
         const { id, name } = group;
         return {
           id,
           name,
         };
       }) ?? [],
-    [],
+    [groups],
   );
+
+  const logout = useCallback(() => {
+    wipeToken();
+    navigate(Route.LOGIN);
+  }, [navigate, wipeToken]);
 
   return (
     <>
       <Nav>
         <Typography color="white">TirusTimes</Typography>
+        <StyledButton onClick={logout}>Logout</StyledButton>
       </Nav>
       <Main>
         <Box sx={styles.container}>
@@ -94,10 +153,10 @@ const Dashboard = (): JSX.Element => {
             placeholder="Procurar grupo..."
           />
           <Paper>
-            {groups.length ? (
+            {groups?.length ? (
               <DataGrid
                 rows={rows}
-                onRowClick={handleOpen}
+                onRowClick={onRowClick}
                 columns={columns}
                 rowCount={groups.length}
                 pageSize={Constants.first}
@@ -121,6 +180,7 @@ const Dashboard = (): JSX.Element => {
             onClose={handleClose}
             groupFormState={groupFormState}
             setGroupFormState={setGroupFormStateHandler}
+            setRefetch={handleRefetch}
             handleClearFilter={handleClear}
           />
         </Box>

@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { Button } from '@mui/material';
 
 import sx from 'utils/createSx';
 
@@ -36,6 +37,21 @@ export const Main = styled.main`
   p {
     max-width: 30rem;
     font-weight: 500;
+  }
+`;
+
+export const StyledButton = styled(Button)`
+  color: white;
+  border: 1px solid white;
+
+  &:hover {
+    color: #2c951c;
+    background-color: white;
+    border: 1px solid white;
+  }
+
+  & + & {
+    margin-left: 1rem;
   }
 `;
 

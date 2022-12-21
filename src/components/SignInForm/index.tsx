@@ -18,13 +18,14 @@ import { VisibilityOff, Visibility } from '@mui/icons-material';
 import { useSnackbar } from 'notistack';
 
 import { validateString } from 'utils/validate-string';
+import { useToken } from 'hooks/useToken';
 
 import Route from 'routes/Route';
 
 import { ButtonsContainer, Main, StyledButton } from './styles';
 
 const INITIAL_DATA = {
-  email: '',
+  username: '',
   password: '',
   showPassword: false,
 };
@@ -33,6 +34,7 @@ const SignInForm: React.FC = () => {
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
   const [loading, setLoading] = useState(false);
+  const { updateToken } = useToken();
   const [formData, setFormData] = useState(INITIAL_DATA);
 
   const handleChange = useCallback(
@@ -48,14 +50,18 @@ const SignInForm: React.FC = () => {
   const handleSubmit = useCallback(async (): Promise<void> => {
     setLoading(true);
     try {
-      validateString(formData.email, 'Email');
-      validateString(formData.password, 'Senha');
+      const { password, username } = formData;
+      validateString(username, 'Nickname');
+      validateString(password, 'Senha');
 
-      const response = await axios.post('/api/login', formData);
+      const response = await axios.post('/api/auth', {
+        username,
+        password,
+      });
 
       if (response.data) {
         setFormData(INITIAL_DATA);
-
+        updateToken(response.data.token);
         navigate(Route.DASHBOARD);
       }
     } catch (error) {
@@ -71,7 +77,7 @@ const SignInForm: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [enqueueSnackbar, formData, navigate]);
+  }, [enqueueSnackbar, formData, navigate, updateToken]);
 
   const handleClickShowPassword = useCallback((): void => {
     setFormData(curr => ({
@@ -95,11 +101,11 @@ const SignInForm: React.FC = () => {
       <form>
         <TextField
           color="success"
-          label="Email"
+          label="Nickname"
           margin="dense"
-          name="email"
+          name="username"
           onChange={handleChange}
-          value={formData.email}
+          value={formData.username}
           variant="standard"
         />
         <FormControl variant="standard" margin="dense">
