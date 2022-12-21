@@ -12,6 +12,7 @@ import { withSentryReactRouterV6Routing, withProfiler } from '@sentry/react';
 import { createLazyComponents } from 'components/LazyComponent';
 
 import Route, { routesInfo } from './Route';
+import PrivateRoute from './PrivateRoute';
 
 const SentryRoutes = withSentryReactRouterV6Routing(RoutesContainer);
 const lazyRoutes = createLazyComponents({
@@ -32,8 +33,15 @@ const Routes = (): JSX.Element => {
         return !currentRoute?.isPrivate ? (
           <RouterRoute path={name} element={<Component />} key={name} />
         ) : (
-          // TODO: For now I`m letting have the same pattern, but it will be created a PrivateRoute wrapper latter on
-          <RouterRoute path={name} element={<Component />} key={name} />
+          <RouterRoute
+            path={name}
+            element={
+              <PrivateRoute>
+                <Component />
+              </PrivateRoute>
+            }
+            key={name}
+          />
         );
       }),
     [],

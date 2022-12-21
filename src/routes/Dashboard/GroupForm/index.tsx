@@ -1,5 +1,7 @@
 import type { ChangeEvent } from 'react';
 
+import axios from 'axios';
+
 import { useState, useCallback, useEffect } from 'react';
 
 import {
@@ -11,7 +13,7 @@ import {
   Button,
 } from '@mui/material';
 
-// import { useSnackbar } from 'notistack';
+import { useSnackbar } from 'notistack';
 
 import ModalHeader from 'components/ModalHeader';
 
@@ -20,10 +22,10 @@ import styles from './styles';
 interface GroupFormProps {
   open: boolean;
   onClose: () => void;
-  groupFormState?: { name: string };
-  setGroupFormState?: (state: { name: string } | undefined) => void;
-  // eslint-disable-next-line react/no-unused-prop-types
-  handleClearFilter?: () => void;
+  groupFormState?: { name: string; id: number };
+  setGroupFormState: (state: { name: string; id: number } | undefined) => void;
+  setRefetch: () => void;
+  handleClearFilter: () => void;
 }
 
 type CreateGroupInput = {
@@ -45,8 +47,10 @@ const GroupForm = ({
   onClose,
   groupFormState,
   setGroupFormState,
+  handleClearFilter,
+  setRefetch,
 }: GroupFormProps): JSX.Element => {
-  // const { enqueueSnackbar } = useSnackbar();
+  const { enqueueSnackbar } = useSnackbar();
   const [formFields, setFormFields] = useState<{ name: string }>(initialState);
 
   useEffect(() => {
@@ -66,44 +70,50 @@ const GroupForm = ({
   );
 
   const handleClose = useCallback(() => {
-    if (setGroupFormState) setGroupFormState(undefined);
+    setGroupFormState(undefined);
     onClose();
   }, [onClose, setGroupFormState]);
 
   const handleClick = useCallback(() => {
-    // if (!groupFormState) {
-    //   // TODO: Create group call
-    //   createGroup({
-    //     ...formFields,
-    //   })
-    //     .then(({ data }) => {
-    //       enqueueSnackbar('Grupo criado com sucesso', {
-    //         variant: 'success',
-    //       });
-    //     })
-    //     .catch(() => {
-    //       enqueueSnackbar('Ocorreu um erro ao criar o grupo', {
-    //         variant: 'error',
-    //       });
-    //     });
-    // } else {
-    //   updateGroup({
-    //     ...formFields,
-    //   })
-    //     .then(() => {
-    //       enqueueSnackbar('Grupo atualizado com sucesso', {
-    //         variant: 'success',
-    //       });
-    //       if (handleClearFilter) handleClearFilter();
-    //     })
-    //     .catch(() => {
-    //       enqueueSnackbar('Ocorreu um erro ao atualizar o grupo', {
-    //         variant: 'error',
-    //       });
-    //     });
-    // }
+    if (!groupFormState) {
+      axios
+        .post('api/groups', formFields)
+        .then(() => {
+          enqueueSnackbar('Grupo criado com sucesso', {
+            variant: 'success',
+          });
+          setRefetch();
+        })
+        .catch(() => {
+          enqueueSnackbar('Ocorreu um erro ao criar o grupo', {
+            variant: 'error',
+          });
+        });
+    } else {
+      axios
+        .put(`api/groups/${groupFormState.id}`, formFields)
+        .then(() => {
+          enqueueSnackbar('Grupo atualizado com sucesso', {
+            variant: 'success',
+          });
+          handleClearFilter();
+          setRefetch();
+        })
+        .catch(() => {
+          enqueueSnackbar('Ocorreu um erro ao atualizar o grupo', {
+            variant: 'error',
+          });
+        });
+    }
     handleClose();
-  }, [handleClose]);
+  }, [
+    enqueueSnackbar,
+    formFields,
+    groupFormState,
+    handleClose,
+    handleClearFilter,
+    setRefetch,
+  ]);
 
   return (
     <Dialog
@@ -129,7 +139,7 @@ const GroupForm = ({
               variant="outlined"
               value={formFields.name}
               fullWidth
-              name="Nome"
+              name="name"
               onChange={onChangeFormFields}
             />
           </FormControl>

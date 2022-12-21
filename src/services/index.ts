@@ -5,8 +5,5 @@ import { setupInterceptorsTo } from './Interceptor';
 export const setupAxios = (): void => {
   setupInterceptorsTo(axios);
 
-  axios.defaults.baseURL = '';
-  axios.defaults.headers.common.Authorization = '';
-  axios.defaults.headers.post['Content-Type'] =
-    'application/x-www-form-urlencoded';
+  axios.defaults.baseURL = 'https://tirus-times-back-hf1g.vercel.app/';
 };
