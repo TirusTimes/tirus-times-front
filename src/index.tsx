@@ -6,7 +6,6 @@ import { SnackbarProvider } from 'notistack';
 import { setupAxios } from 'services';
 import Logging from 'services/logging';
 
-import { makeServer } from './server';
 import Theme from './theme';
 
 import Routes from './routes';
@@ -15,10 +14,6 @@ import './styles.css';
 
 Logging.setUp();
 setupAxios();
-
-if (process.env.NODE_ENV === 'development') {
-  makeServer({ environment: 'development' });
-}
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const root = ReactDOM.createRoot(document.getElementById('root')!);
