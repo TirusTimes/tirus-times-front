@@ -25,7 +25,7 @@ import Route from 'routes/Route';
 import { ButtonsContainer, Main, StyledButton } from './styles';
 
 const INITIAL_DATA = {
-  username: '',
+  email: '',
   password: '',
   showPassword: false,
 };
@@ -50,12 +50,12 @@ const SignInForm: React.FC = () => {
   const handleSubmit = useCallback(async (): Promise<void> => {
     setLoading(true);
     try {
-      const { password, username } = formData;
-      validateString(username, 'Nickname');
+      const { password, email } = formData;
+      validateString(email, 'Email');
       validateString(password, 'Senha');
 
       const response = await axios.post('/api/auth', {
-        username,
+        email,
         password,
       });
 
@@ -101,11 +101,11 @@ const SignInForm: React.FC = () => {
       <form>
         <TextField
           color="success"
-          label="Nickname"
+          label="Email"
           margin="dense"
-          name="username"
+          name="email"
           onChange={handleChange}
-          value={formData.username}
+          value={formData.email}
           variant="standard"
         />
         <FormControl variant="standard" margin="dense">
