@@ -8,6 +8,12 @@ import type {
 import Logging from 'services/logging';
 
 const onRequest = (config: AxiosRequestConfig): AxiosRequestConfig => {
+  const storageToken = window.localStorage.getItem('token');
+  // eslint-disable-next-line no-param-reassign
+  config.headers = {
+    ...config.headers,
+    Authorization: `Bearer ${storageToken ?? ``}`,
+  };
   return config;
 };
 
