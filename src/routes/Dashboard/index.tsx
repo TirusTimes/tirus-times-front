@@ -1,47 +1,32 @@
-import { useMemo, useState, useCallback, useEffect } from 'react';
-
-import { DataGrid } from '@mui/x-data-grid';
+import type { ChangeEvent } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 
 import axios from 'axios';
 
 import type { AxiosError } from 'axios';
 
-import type { GridColumns } from '@mui/x-data-grid';
-
-import { Paper, ButtonBase, Fab, Box, Typography } from '@mui/material';
+import { Fab } from '@mui/material';
 
 import AddIcon from '@mui/icons-material/Add';
 
 import { useSnackbar } from 'notistack';
 
-import { useNavigate } from 'react-router-dom';
-
-import SearchBar from 'components/SearchBar';
+import { Link } from 'react-router-dom';
 
 import { useModal } from 'hooks/useModal';
 
-import { useToken } from 'hooks/useToken';
+import { Background } from 'components/Background';
 
-import Route from 'routes/Route';
+import NavBar from 'components/NavBar';
 
-import styles, { Nav, Main, StyledButton } from './styles';
+import styles, { Main } from './styles';
 
 import GroupForm from './GroupForm';
-import NoRows from './NoRows';
-
-const columnKeys = ['name'];
 
 const Constants = {
   first: 5,
   initialFilter: {},
 };
-
-const columns: GridColumns = columnKeys.map(column => ({
-  field: column,
-  headerName: column,
-  width: 200,
-  renderCell: (params): JSX.Element => <ButtonBase>{params.value}</ButtonBase>,
-}));
 
 interface GroupsInterface {
   id: number;
@@ -59,13 +44,12 @@ const Dashboard = (): JSX.Element => {
 
   const { isOpen, handleOpen, handleClose } = useModal();
   const { enqueueSnackbar } = useSnackbar();
-  const { wipeToken } = useToken();
-  const navigate = useNavigate();
   const [refetch, setRefetch] = useState(false);
 
   const [groups, setGroups] = useState<GroupsInterface[] | undefined>(
     undefined,
   );
+  const [rows, setRows] = useState<GroupsInterface[] | undefined>(undefined);
 
   const [groupFormState, setGroupFormState] = useState(
     {} as GroupForm | undefined,
@@ -76,6 +60,7 @@ const Dashboard = (): JSX.Element => {
       .get('/api/groups')
       .then(response => {
         setGroups(response.data);
+        setRows(response.data);
       })
       .catch(error => {
         const err = error as AxiosError;
@@ -91,21 +76,16 @@ const Dashboard = (): JSX.Element => {
     handleOpen();
   }, [setGroupFormState, handleOpen]);
 
-  const onRowClick = useCallback(
-    (data: any) => {
-      setGroupFormState(data.row);
-      handleOpen();
-    },
-    [handleOpen, setGroupFormState],
-  );
+  const handleSearch = (event: ChangeEvent<HTMLInputElement>) => {
+    const searchText = event?.target?.value.toLowerCase().trim();
+    const filtered = searchText
+      ? rows?.filter(group => {
+          return group.name.toLowerCase().includes(searchText);
+        })
+      : groups;
 
-  const handleSearch = useCallback((searchText: string): void => {
-    const newFilter =
-      searchText.length > 0
-        ? { name: { contains: searchText } }
-        : Constants.initialFilter;
-    setFilter(newFilter);
-  }, []);
+    setRows(filtered);
+  };
 
   const handleClear = useCallback((): void => {
     setFilter(Constants.initialFilter);
@@ -122,68 +102,46 @@ const Dashboard = (): JSX.Element => {
     [],
   );
 
-  const rows = useMemo(
-    () =>
-      groups?.map(group => {
-        const { id, name } = group;
-        return {
-          id,
-          name,
-        };
-      }) ?? [],
-    [groups],
-  );
-
-  const logout = useCallback(() => {
-    wipeToken();
-    navigate(Route.LOGIN);
-  }, [navigate, wipeToken]);
-
   return (
     <>
-      <Nav>
-        <Typography color="white">TirusTimes</Typography>
-        <StyledButton onClick={logout}>Logout</StyledButton>
-      </Nav>
+      <Background />
+      <NavBar />
       <Main>
-        <Box sx={styles.container}>
-          <SearchBar
-            onSearch={handleSearch}
-            onClear={handleClear}
+        <div className="box">
+          <input
+            className="search"
+            type="text"
             placeholder="Procurar grupo..."
+            onChange={handleSearch}
           />
-          <Paper>
-            {groups?.length ? (
-              <DataGrid
-                rows={rows}
-                onRowClick={onRowClick}
-                columns={columns}
-                rowCount={groups.length}
-                pageSize={Constants.first}
-                autoHeight
-                hideFooter
-              />
-            ) : (
-              <NoRows />
-            )}
-          </Paper>
-          <Fab
-            sx={styles.button}
-            size="medium"
-            color="secondary"
-            onClick={handleAddOpen}
-          >
-            <AddIcon />
-          </Fab>
-          <GroupForm
-            open={isOpen}
-            onClose={handleClose}
-            groupFormState={groupFormState}
-            setGroupFormState={setGroupFormStateHandler}
-            setRefetch={handleRefetch}
-            handleClearFilter={handleClear}
-          />
-        </Box>
+          <div>
+            <ul>
+              {rows?.map(group => (
+                <li key={group.id}>
+                  <Link to={`/group/${group.id}`}>
+                    <button type="button">{group.name}</button>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+        <Fab
+          sx={styles.button}
+          size="medium"
+          color="secondary"
+          onClick={handleAddOpen}
+        >
+          <AddIcon />
+        </Fab>
+        <GroupForm
+          open={isOpen}
+          onClose={handleClose}
+          groupFormState={groupFormState}
+          setGroupFormState={setGroupFormStateHandler}
+          setRefetch={handleRefetch}
+          handleClearFilter={handleClear}
+        />
       </Main>
     </>
   );

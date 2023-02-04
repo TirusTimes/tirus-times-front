@@ -1,7 +1,5 @@
 import styled from 'styled-components';
 
-import sx from 'utils/createSx';
-
 export const Main = styled.main`
   position: absolute;
   margin-top: calc(3.75rem + 1rem);
@@ -55,11 +53,3 @@ export const Main = styled.main`
     }
   }
 `;
-
-export default sx({
-  button: {
-    position: 'absolute',
-    right: '2vw',
-    bottom: '15vh',
-  },
-});

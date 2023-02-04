@@ -57,13 +57,6 @@ module.exports = {
     '@typescript-eslint/no-empty-function': 'off',
     '@typescript-eslint/no-inferrable-types': 'warn',
     '@typescript-eslint/no-shadow': ['warn', { ignoreTypeValueShadow: true }],
-    '@typescript-eslint/no-unused-vars': [
-      'error',
-      {
-        argsIgnorePattern: '^_',
-        varsIgnorePattern: '^_',
-      },
-    ],
     '@typescript-eslint/no-use-before-define': 'warn',
     '@typescript-eslint/no-floating-promises': 'error',
     '@typescript-eslint/no-misused-promises': 'warn',
@@ -119,7 +112,6 @@ module.exports = {
     ],
     'no-shadow': 'off',
     'no-underscore-dangle': ['error', { allow: ['__typename', '__DEV__'] }],
-    'no-unused-vars': 'off',
     'no-use-before-define': 'off',
     'prettier/prettier': [
       'error',

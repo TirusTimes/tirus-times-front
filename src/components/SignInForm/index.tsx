@@ -60,6 +60,7 @@ const SignInForm: React.FC = () => {
       });
 
       if (response.data) {
+        localStorage.setItem('user', JSON.stringify(response.data.user));
         setFormData(INITIAL_DATA);
         updateToken(response.data.token);
         navigate(Route.DASHBOARD);
