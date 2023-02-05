@@ -18,18 +18,24 @@ interface GroupsInterface {
   id: number;
   name: string;
   created_at: string;
+  adminID: number;
 }
 
 const GroupDetails = (): JSX.Element => {
-  const { id } = useParams();
+  const { id: groupID } = useParams();
 
   const { enqueueSnackbar } = useSnackbar();
 
   const [group, setGroup] = useState<GroupsInterface | undefined>(undefined);
+  const [match, setMatch] = useState<any | undefined>(undefined);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const user = JSON.parse(String(localStorage.getItem('user')));
+  const isGroupAdmin = group?.adminID === user.id;
 
   useEffect(() => {
     axios
-      .get(`/api/groups/${id}`)
+      .get(`/api/groups/${groupID}`)
       .then(response => {
         setGroup(response.data);
       })
@@ -39,8 +45,49 @@ const GroupDetails = (): JSX.Element => {
           variant: 'error',
         });
       });
+
+    axios
+      .get(`/api/match`)
+      .then(response => {
+        setMatch(
+          response.data.filter(
+            (item: any) => item.groupId === Number(groupID),
+          )[0],
+        );
+      })
+      .catch(error => {
+        const err = error as AxiosError;
+        enqueueSnackbar(err?.message || 'Ops, algo deu errado...', {
+          variant: 'error',
+        });
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const handleAskInvite = async () => {
+    try {
+      if (!isLoading) {
+        setIsLoading(true);
+
+        const response = await axios.post(
+          `/api/group/${groupID}/user/${user.id}`,
+        );
+
+        if (response.data) {
+          enqueueSnackbar('Solicitação de entrada enviada com sucesso', {
+            variant: 'success',
+          });
+        }
+      }
+    } catch (error) {
+      const err = error as AxiosError;
+      enqueueSnackbar(err?.message || 'Ops, algo deu errado...', {
+        variant: 'error',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <>
@@ -60,14 +107,23 @@ const GroupDetails = (): JSX.Element => {
               </p>
             </div>
             <div className="buttons">
-              <Link to="match/123">
+              <Link to={match ? `match/${match.id}` : 'match'}>
                 <button type="button">Partida</button>
               </Link>
-              <button type="button" disabled>
-                Convite
-                <br />
-                <small>(em breve)</small>
-              </button>
+
+              {isGroupAdmin ? (
+                <Link to="invites">
+                  <button type="button">
+                    Pedidos <br />
+                    de entrada
+                  </button>
+                </Link>
+              ) : (
+                <button type="button" onClick={handleAskInvite}>
+                  Solicitar <br />
+                  entrada
+                </button>
+              )}
             </div>
           </div>
         </div>

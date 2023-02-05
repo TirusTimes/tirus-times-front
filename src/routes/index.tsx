@@ -23,6 +23,13 @@ const lazyRoutes = createLazyComponents({
   [Route.NOT_FOUND]: () => import(`./NotFound`),
   [Route.GROUP_DETAILS]: () => import(`./GroupDetails`),
   [Route.PROFILE]: () => import(`./Profile`),
+  [Route.MATCH_DETAILS]: () => import(`./MatchDetails`),
+  [Route.NO_MATCH]: () => import(`./NoMatch`),
+  [Route.NEW_MATCH]: () => import(`./NewMatch`),
+  [Route.EDIT_MATCH]: () => import(`./EditMatch`),
+  [Route.INVITES]: () => import(`./Invites`),
+  [Route.EVALUATE]: () => import(`./Evaluate`),
+  [Route.EVALUATE_USER]: () => import(`./EvaluateUser`),
 });
 
 const redirectToNotFound = (): JSX.Element => <Navigate to={Route.NOT_FOUND} />;
