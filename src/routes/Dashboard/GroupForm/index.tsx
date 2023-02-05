@@ -75,9 +75,11 @@ const GroupForm = ({
   }, [onClose, setGroupFormState]);
 
   const handleClick = useCallback(() => {
+    const adminID = JSON.parse(String(localStorage.getItem('user'))).id;
+
     if (!groupFormState) {
       axios
-        .post('api/groups', formFields)
+        .post('api/groups', { ...formFields, adminID })
         .then(() => {
           enqueueSnackbar('Grupo criado com sucesso', {
             variant: 'success',
