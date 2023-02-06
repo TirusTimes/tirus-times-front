@@ -24,16 +24,30 @@ interface GroupsInterface {
 const Invites = (): JSX.Element => {
   const { group: groupID } = useParams();
   const { enqueueSnackbar } = useSnackbar();
+  const [requests, setRequests] = useState<any[] | undefined>(undefined);
   const [group, setGroup] = useState<GroupsInterface | undefined>(undefined);
+  const [users, setUsers] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const user = JSON.parse(String(localStorage.getItem('user')));
 
   useEffect(() => {
     axios
-      .get(`/api/group/${groupID}/owner/${user.id}`)
+      .get(`/api/groups/${groupID}`)
       .then(response => {
         setGroup(response.data);
+      })
+      .catch(error => {
+        const err = error as AxiosError;
+        enqueueSnackbar(err?.message || 'Ops, algo deu errado...', {
+          variant: 'error',
+        });
+      });
+
+    axios
+      .get(`/api/group/${groupID}/owner/${user.id}`)
+      .then(response => {
+        setRequests(response.data);
       })
       .catch(error => {
         const err = error as AxiosError;
@@ -45,11 +59,23 @@ const Invites = (): JSX.Element => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const array = [
-    { firstname: 'John', lastname: 'Doe', id: 1 },
-    { firstname: 'Mary', lastname: 'Jane', id: 2 },
-    { firstname: 'Peter', lastname: 'Parker', id: 3 },
-  ];
+  useEffect(() => {
+    requests?.forEach((req: any) => {
+      axios
+        .get(`/api/users/${req.userId}`)
+        .then(response => {
+          if (users.indexOf(response.data) === -1) {
+            setUsers([...users, response.data]);
+          }
+        })
+        .catch(error => {
+          const err = error as AxiosError;
+          enqueueSnackbar(err?.message || 'Ops, algo deu errado...', {
+            variant: 'error',
+          });
+        });
+    });
+  }, [requests]);
 
   const handleAccept = async (idToAccept: number) => {
     try {
@@ -112,7 +138,7 @@ const Invites = (): JSX.Element => {
             <h1>Solicitações pendentes</h1>
             <h4>Deseja aceitar?</h4>
             <div className="description">
-              {array.map(item => (
+              {users.map(item => (
                 <div key={item.id}>
                   <span>
                     {item.firstname} {item.lastname}
