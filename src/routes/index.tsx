@@ -30,6 +30,7 @@ const lazyRoutes = createLazyComponents({
   [Route.INVITES]: () => import(`./Invites`),
   [Route.EVALUATE]: () => import(`./Evaluate`),
   [Route.EVALUATE_USER]: () => import(`./EvaluateUser`),
+  [Route.CHOOSE]: () => import(`./ChooseTeams`),
 });
 
 const redirectToNotFound = (): JSX.Element => <Navigate to={Route.NOT_FOUND} />;

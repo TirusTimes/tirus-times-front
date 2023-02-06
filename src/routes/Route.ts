@@ -11,6 +11,7 @@ const Route = {
   EDIT_MATCH: '/group/:group/match/:match/edit',
   PROFILE: '/profile',
   INVITES: '/group/:group/invites',
+  CHOOSE: '/group/:group/match/:match/choose',
   EVALUATE: '/group/:group/match/:match/evaluate',
   EVALUATE_USER: '/group/:group/match/:match/evaluate/:user',
   UNKNOWN_ROUTE: '*',
@@ -38,4 +39,5 @@ export const routesInfo = [
   { path: Route.EDIT_MATCH, isPrivate: true },
   { path: Route.EVALUATE, isPrivate: true },
   { path: Route.EVALUATE_USER, isPrivate: true },
+  { path: Route.CHOOSE, isPrivate: true },
 ];
