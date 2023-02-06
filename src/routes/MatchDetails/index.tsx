@@ -35,6 +35,7 @@ const MatchDetails = (): JSX.Element => {
   const { enqueueSnackbar } = useSnackbar();
   const [group, setGroup] = useState<GroupsInterface | undefined>(undefined);
   const [match, setMatch] = useState<MatchInterface | undefined>(undefined);
+  const [users, setUsers] = useState<any[]>([]);
 
   const user = JSON.parse(String(localStorage.getItem('user')));
   const isGroupAdmin = group?.adminID === user.id;
@@ -64,6 +65,18 @@ const MatchDetails = (): JSX.Element => {
         });
       });
 
+    axios
+      .get(`/api/groups/${groupID}/users`)
+      .then(response => {
+        setUsers(response.data);
+      })
+      .catch(error => {
+        const err = error as AxiosError;
+        enqueueSnackbar(err?.message || 'Ops, algo deu errado...', {
+          variant: 'error',
+        });
+      });
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -79,7 +92,9 @@ const MatchDetails = (): JSX.Element => {
           <div className="content">
             <div className="description">
               <span>Local: {match?.location}</span>
-              <span>Jogadores: X/{match?.playerLimit}</span>
+              <span>
+                Jogadores: {users.length}/{match?.playerLimit}
+              </span>
               <span>
                 Dia: {new Date(String(match?.date)).toLocaleDateString('pt-BR')}{' '}
               </span>
@@ -99,9 +114,14 @@ const MatchDetails = (): JSX.Element => {
 const AdminMatchView = () => {
   return (
     <>
-      <button type="button">Separar Equipes</button>
+      <Link to="choose">
+        <button type="button">Separar Equipes</button>
+      </Link>
       <Link to="edit">
         <button type="button">Editar partida atual</button>
+      </Link>
+      <Link to="evaluate">
+        <button type="button">Iniciar avaliação</button>
       </Link>
       <button type="button">Entrar</button>
     </>
@@ -109,7 +129,15 @@ const AdminMatchView = () => {
 };
 
 const UserMatchView = () => {
-  return <button type="button">Entrar/Sair/Avaliar</button>;
+  return (
+    <>
+      <button type="button">Entrar/Sair/Avaliar</button>
+      <button type="button">Ver confronto</button>
+      <Link to="evaluate">
+        <button type="button">Iniciar avaliação</button>
+      </Link>
+    </>
+  );
 };
 
 export default MatchDetails;
