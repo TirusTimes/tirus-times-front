@@ -21,30 +21,32 @@ interface GroupsInterface {
   adminID: number;
 }
 
-// interface MatchInterface {
-//   id: number;
-//   location: string;
-//   date: string;
-//   playerLimit: number;
-//   status: string;
-//   time: string;
-// }
-
 const ChooseTeams = (): JSX.Element => {
-  const { match: matchID } = useParams();
+  const { group: groupID, match: matchID } = useParams();
   const { enqueueSnackbar } = useSnackbar();
   const [group, setGroup] = useState<GroupsInterface | undefined>(undefined);
-  // const [match, setMatch] = useState<MatchInterface | undefined>(undefined);
-  // const [users, setUsers] = useState<any[]>([]);
+  const [players, setPlayers] = useState<any[]>([]);
 
   const user = JSON.parse(String(localStorage.getItem('user')));
   const isGroupAdmin = group?.adminID === user.id;
 
   useEffect(() => {
     axios
-      .get(`/api/match/choose/${matchID}`)
+      .get(`/api/groups/${groupID}`)
       .then(response => {
         setGroup(response.data);
+      })
+      .catch(error => {
+        const err = error as AxiosError;
+        enqueueSnackbar(err?.message || 'Ops, algo deu errado...', {
+          variant: 'error',
+        });
+      });
+
+    axios
+      .get(`/api/match/choose/${matchID}`)
+      .then(response => {
+        setPlayers(response.data);
       })
       .catch(error => {
         const err = error as AxiosError;
@@ -56,26 +58,12 @@ const ChooseTeams = (): JSX.Element => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const team1 = [
-    { firstname: 'John', lastname: 'Doe', id: 1 },
-    { firstname: 'Mary', lastname: 'Jane', id: 2 },
-    { firstname: 'Peter', lastname: 'Parker', id: 4 },
-    { firstname: 'John', lastname: 'Doe', id: 3 },
-    { firstname: 'Mary', lastname: 'Jane', id: 5 },
-  ];
-
-  const team2 = [
-    { firstname: 'John', lastname: 'Doe', id: 6 },
-    { firstname: 'Mary', lastname: 'Jane', id: 7 },
-    { firstname: 'Peter', lastname: 'Parker', id: 8 },
-    { firstname: 'John', lastname: 'Doe', id: 9 },
-    { firstname: 'John', lastname: 'Doe', id: 10 },
-  ];
-
   const team1Text = () => {
     if (isGroupAdmin) return 'Equipe 1';
 
-    const userIsInFirstTeam = team1.find(element => element.id === user.id);
+    const userIsInFirstTeam = players[0]?.team?.find(
+      (element: any) => element.id === user.id,
+    );
 
     return userIsInFirstTeam ? 'Seu Time' : 'Time Adversário';
   };
@@ -83,9 +71,11 @@ const ChooseTeams = (): JSX.Element => {
   const team2Text = () => {
     if (isGroupAdmin) return 'Equipe 2';
 
-    const userIsInFirstTeam = team2.find(element => element.id === user.id);
+    const userIsInSecondTeam = players[1]?.team?.find(
+      (element: any) => element.id === user.id,
+    );
 
-    return userIsInFirstTeam ? 'Seu Time' : 'Time Adversário';
+    return userIsInSecondTeam ? 'Seu Time' : 'Time Adversário';
   };
 
   return (
@@ -98,20 +88,16 @@ const ChooseTeams = (): JSX.Element => {
             <div>
               <h3>{team1Text()}</h3>
               <div className="description">
-                {team1.map(item => (
-                  <span key={item.id}>
-                    {item.firstname} {item.lastname}
-                  </span>
+                {players[0]?.team?.map((item: any) => (
+                  <span key={item.id}>{item.name}</span>
                 ))}
               </div>
             </div>
             <div>
               <h3>{team2Text()}</h3>
               <div className="description">
-                {team2.map(item => (
-                  <span key={item.id}>
-                    {item.firstname} {item.lastname}
-                  </span>
+                {players[1]?.team?.map((item: any) => (
+                  <span key={item.id}>{item.name}</span>
                 ))}
               </div>
             </div>

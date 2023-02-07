@@ -36,9 +36,35 @@ const MatchDetails = (): JSX.Element => {
   const [group, setGroup] = useState<GroupsInterface | undefined>(undefined);
   const [match, setMatch] = useState<MatchInterface | undefined>(undefined);
   const [users, setUsers] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const user = JSON.parse(String(localStorage.getItem('user')));
   const isGroupAdmin = group?.adminID === user.id;
+
+  const handleEnter = async () => {
+    try {
+      if (!isLoading) {
+        setIsLoading(true);
+
+        const response = await axios.post(
+          `/api/match/${matchID}/user/${user.id}`,
+        );
+
+        if (response.data) {
+          enqueueSnackbar('Solicitação de entrada enviada com sucesso', {
+            variant: 'success',
+          });
+        }
+      }
+    } catch (error) {
+      const err = error as AxiosError;
+      enqueueSnackbar(err?.message || 'Ops, algo deu errado...', {
+        variant: 'error',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     axios
@@ -80,6 +106,13 @@ const MatchDetails = (): JSX.Element => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const statuses = {
+    OPEN: 'Aberto',
+    STARTED: 'Iniciado',
+    FINISHED: 'Finalizado',
+    EVALUATE: 'Avaliar',
+  };
+
   return (
     <>
       <Background />
@@ -87,7 +120,8 @@ const MatchDetails = (): JSX.Element => {
       <Main>
         <div className="box">
           <h1>
-            {group?.name} {match && `- ${match.status}`}
+            {group?.name}{' '}
+            {match && `- ${statuses[match?.status as keyof typeof statuses]}`}
           </h1>
           <div className="content">
             <div className="description">
@@ -102,7 +136,19 @@ const MatchDetails = (): JSX.Element => {
             </div>
 
             <div className="buttons">
-              {isGroupAdmin ? <AdminMatchView /> : <UserMatchView />}
+              {isGroupAdmin ? (
+                <AdminMatchView
+                  status={String(match?.status)}
+                  handleEnter={handleEnter}
+                  isLoading={isLoading}
+                />
+              ) : (
+                <UserMatchView
+                  status={String(match?.status)}
+                  handleEnter={handleEnter}
+                  isLoading={isLoading}
+                />
+              )}
             </div>
           </div>
         </div>
@@ -111,33 +157,87 @@ const MatchDetails = (): JSX.Element => {
   );
 };
 
-const AdminMatchView = () => {
-  return (
-    <>
-      <Link to="choose">
-        <button type="button">Separar Equipes</button>
-      </Link>
-      <Link to="edit">
-        <button type="button">Editar partida atual</button>
-      </Link>
-      <Link to="evaluate">
-        <button type="button">Iniciar avaliação</button>
-      </Link>
-      <button type="button">Entrar</button>
-    </>
-  );
+const AdminMatchView = ({
+  status,
+  handleEnter,
+  isLoading,
+}: {
+  status: string;
+  handleEnter: () => void;
+  isLoading: boolean;
+}): JSX.Element => {
+  const buttonRender = () => {
+    const options = {
+      OPEN: (
+        <>
+          <Link to="edit">
+            <button type="button">Editar partida atual</button>
+          </Link>
+          <button type="button" disabled={isLoading} onClick={handleEnter}>
+            Entrar
+          </button>
+        </>
+      ),
+      STARTED: (
+        <Link to="choose">
+          <button type="button">Separar Equipes</button>
+        </Link>
+      ),
+      FINISHED: (
+        <button type="button">
+          Iniciar avaliação <small>(aguardando...)</small>
+        </button>
+      ),
+      EVALUATE: (
+        <Link to="evaluate">
+          <button type="button">Iniciar avaliação</button>
+        </Link>
+      ),
+    };
+
+    return options[status as keyof typeof options];
+  };
+
+  return <>{buttonRender()}</>;
 };
 
-const UserMatchView = () => {
-  return (
-    <>
-      <button type="button">Entrar/Sair/Avaliar</button>
-      <button type="button">Ver confronto</button>
-      <Link to="evaluate">
-        <button type="button">Iniciar avaliação</button>
-      </Link>
-    </>
-  );
+const UserMatchView = ({
+  status,
+  handleEnter,
+  isLoading,
+}: {
+  status: string;
+  handleEnter: () => void;
+  isLoading: boolean;
+}): JSX.Element => {
+  const buttonRender = () => {
+    const options = {
+      OPEN: (
+        <button type="button" disabled={isLoading} onClick={handleEnter}>
+          Entrar
+        </button>
+      ),
+      STARTED: (
+        <Link to="choose">
+          <button type="button">Ver confronto</button>
+        </Link>
+      ),
+      FINISHED: (
+        <button type="button">
+          Iniciar avaliação <small>(aguardando...)</small>
+        </button>
+      ),
+      EVALUATE: (
+        <Link to="evaluate">
+          <button type="button">Iniciar avaliação</button>
+        </Link>
+      ),
+    };
+
+    return options[status as keyof typeof options];
+  };
+
+  return <>{buttonRender()}</>;
 };
 
 export default MatchDetails;
