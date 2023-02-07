@@ -173,15 +173,23 @@ const AdminMatchView = ({
           <Link to="edit">
             <button type="button">Editar partida atual</button>
           </Link>
+          <Link to="choose">
+            <button type="button">Separar Equipes</button>
+          </Link>
           <button type="button" disabled={isLoading} onClick={handleEnter}>
             Entrar
           </button>
         </>
       ),
       STARTED: (
-        <Link to="choose">
-          <button type="button">Separar Equipes</button>
-        </Link>
+        <>
+          <Link to="choose">
+            <button type="button">Separar Equipes</button>
+          </Link>
+          <button type="button" disabled={isLoading} onClick={handleEnter}>
+            Entrar
+          </button>
+        </>
       ),
       FINISHED: (
         <button type="button">
