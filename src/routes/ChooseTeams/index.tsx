@@ -12,7 +12,7 @@ import { Background } from 'components/Background';
 
 import NavBar from 'components/NavBar';
 
-import { Main } from './styles';
+import { Main, StyledButton } from './styles';
 
 interface GroupsInterface {
   id: number;
@@ -26,6 +26,7 @@ const ChooseTeams = (): JSX.Element => {
   const { enqueueSnackbar } = useSnackbar();
   const [group, setGroup] = useState<GroupsInterface | undefined>(undefined);
   const [players, setPlayers] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const user = JSON.parse(String(localStorage.getItem('user')));
   const isGroupAdmin = group?.adminID === user.id;
@@ -78,6 +79,33 @@ const ChooseTeams = (): JSX.Element => {
     return userIsInSecondTeam ? 'Seu Time' : 'Time Adversário';
   };
 
+  const handleStart = async () => {
+    try {
+      if (!isLoading) {
+        setIsLoading(true);
+
+        const response = await axios.patch(`/api/match/${matchID}`, {
+          id: matchID,
+          adminID: group?.adminID,
+          status: 'STARTED',
+        });
+
+        if (response.data) {
+          enqueueSnackbar('Solicitação de entrada enviada com sucesso', {
+            variant: 'success',
+          });
+        }
+      }
+    } catch (error) {
+      const err = error as AxiosError;
+      enqueueSnackbar(err?.message || 'Ops, algo deu errado...', {
+        variant: 'error',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <>
       <Background />
@@ -102,13 +130,13 @@ const ChooseTeams = (): JSX.Element => {
               </div>
             </div>
           </div>
-          {/* <StyledButton
+          <StyledButton
             type="button"
-            // disabled={isLoading}
-            // onClick={handleEvaluate}
+            disabled={isLoading}
+            onClick={handleStart}
           >
             Iniciar
-          </StyledButton> */}
+          </StyledButton>
         </div>
       </Main>
     </>
