@@ -66,6 +66,33 @@ const MatchDetails = (): JSX.Element => {
     }
   };
 
+  const handleFinish = async () => {
+    try {
+      if (!isLoading) {
+        setIsLoading(true);
+
+        const response = await axios.patch(`/api/match/${matchID}`, {
+          id: matchID,
+          adminID: group?.adminID,
+          status: 'EVALUATE',
+        });
+
+        if (response.data) {
+          enqueueSnackbar('Solicitação de entrada enviada com sucesso', {
+            variant: 'success',
+          });
+        }
+      }
+    } catch (error) {
+      const err = error as AxiosError;
+      enqueueSnackbar(err?.message || 'Ops, algo deu errado...', {
+        variant: 'error',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     axios
       .get(`/api/groups/${groupID}`)
@@ -140,6 +167,7 @@ const MatchDetails = (): JSX.Element => {
                 <AdminMatchView
                   status={String(match?.status)}
                   handleEnter={handleEnter}
+                  handleFinish={handleFinish}
                   isLoading={isLoading}
                 />
               ) : (
@@ -160,10 +188,12 @@ const MatchDetails = (): JSX.Element => {
 const AdminMatchView = ({
   status,
   handleEnter,
+  handleFinish,
   isLoading,
 }: {
   status: string;
   handleEnter: () => void;
+  handleFinish: () => void;
   isLoading: boolean;
 }): JSX.Element => {
   const buttonRender = () => {
@@ -184,10 +214,10 @@ const AdminMatchView = ({
       STARTED: (
         <>
           <Link to="choose">
-            <button type="button">Separar Equipes</button>
+            <button type="button">Ver confronto</button>
           </Link>
-          <button type="button" disabled={isLoading} onClick={handleEnter}>
-            Entrar
+          <button type="button" disabled={isLoading} onClick={handleFinish}>
+            Encerrar partida
           </button>
         </>
       ),
