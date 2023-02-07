@@ -47,10 +47,9 @@ const EvaluateUser = (): JSX.Element => {
       if (!isLoading) {
         setIsLoading(true);
 
-        const response = await axios.post(`/api/avaliation`, {
-          userId: String(player?.id),
-          avaliation: grade,
-        });
+        const response = await axios.post(
+          `/api/avaliation/${grade}/user/${player?.id}`,
+        );
 
         if (response.data) {
           enqueueSnackbar('Avaliação feita com sucesso', {

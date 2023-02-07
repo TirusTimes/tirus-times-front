@@ -61,12 +61,11 @@ export const Main = styled.main`
       }
 
       .buttons {
-        flex-basis: 0;
-        flex-grow: 1;
         display: flex;
         flex-direction: column;
         border-radius: 10px;
         border: 1px solid black;
+        height: fit-content;
 
         button {
           background: rgba(0, 0, 0, 0.05);
