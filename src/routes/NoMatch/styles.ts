@@ -20,7 +20,6 @@ export const Main = styled.main`
   }
 
   p {
-    max-width: 30rem;
     font-weight: 500;
   }
 
@@ -32,12 +31,15 @@ export const Main = styled.main`
   .box {
     background-color: white;
     padding: 16px 32px;
-    min-width: 400px;
-    min-height: 400px;
+    width: 50%;
+    height: 50%;
+    min-width: 18rem;
+    min-height: 23rem;
 
     .content {
       display: flex;
       gap: 64px;
+      align-items: center;
 
       .description {
         background: rgba(0, 0, 0, 0.05);

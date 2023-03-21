@@ -34,9 +34,11 @@ export const Main = styled.main`
   .box {
     background-color: white;
     padding: 16px 32px;
-    min-width: 400px;
-    min-height: 400px;
+    min-width: 18rem;
+    min-height: 26rem;
 
+    width: 60%;
+    height: 60%;
     ul {
       list-style: none;
       padding-left: 0;

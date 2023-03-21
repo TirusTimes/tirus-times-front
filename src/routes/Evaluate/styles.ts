@@ -22,8 +22,8 @@ export const Main = styled.main`
   .box {
     background-color: white;
     padding: 32px 32px;
-    min-width: 400px;
-    min-height: 400px;
+    min-width: 18rem;
+    min-height: 23rem;
 
     h1 {
       margin-top: 0;

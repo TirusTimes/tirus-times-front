@@ -45,7 +45,7 @@ const Invites = (): JSX.Element => {
       });
 
     axios
-      .get(`/api/group/${groupID}/owner/${user.id}`)
+      .get(`/api/group/${groupID}/owner/${user?.id}`)
       .then(response => {
         setRequests(response.data);
       })
@@ -83,7 +83,7 @@ const Invites = (): JSX.Element => {
         setIsLoading(true);
 
         const response = await axios.post(
-          `/api/group/${groupID}/owner/${user.id}/insertUser/${idToAccept}`,
+          `/api/group/${groupID}/owner/${user?.id}/insertUser/${idToAccept}`,
         );
 
         if (response.data) {

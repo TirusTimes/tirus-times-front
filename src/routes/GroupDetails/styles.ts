@@ -32,8 +32,9 @@ export const Main = styled.main`
   .box {
     background-color: white;
     padding: 16px 32px;
-    min-width: 400px;
-    min-height: 400px;
+
+    min-width: 10rem;
+    min-height: 23rem;
 
     .content {
       display: flex;

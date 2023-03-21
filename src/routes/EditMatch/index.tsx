@@ -42,7 +42,7 @@ const EditMatch = (): JSX.Element => {
   const [match, setMatch] = useState<MatchInterface | undefined>();
   const [isLoading, setIsLoading] = useState(false);
 
-  const adminID = JSON.parse(String(localStorage.getItem('user'))).id;
+  const adminID = JSON.parse(String(localStorage.getItem('user')))?.id;
 
   useEffect(() => {
     axios

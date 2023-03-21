@@ -27,7 +27,7 @@ const NoMatch = (): JSX.Element => {
   const [group, setGroup] = useState<GroupsInterface | undefined>(undefined);
 
   const user = JSON.parse(String(localStorage.getItem('user')));
-  const isGroupAdmin = group?.adminID === user.id;
+  const isGroupAdmin = group?.adminID === user?.id;
 
   useEffect(() => {
     axios
