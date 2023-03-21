@@ -29,7 +29,7 @@ const ChooseTeams = (): JSX.Element => {
   const [isLoading, setIsLoading] = useState(false);
 
   const user = JSON.parse(String(localStorage.getItem('user')));
-  const isGroupAdmin = group?.adminID === user.id;
+  const isGroupAdmin = group?.adminID === user?.id;
 
   useEffect(() => {
     axios
@@ -63,7 +63,7 @@ const ChooseTeams = (): JSX.Element => {
     if (isGroupAdmin) return 'Equipe 1';
 
     const userIsInFirstTeam = players[0]?.team?.find(
-      (element: any) => element.id === user.id,
+      (element: any) => element.id === user?.id,
     );
 
     return userIsInFirstTeam ? 'Seu Time' : 'Time Adversário';
@@ -73,7 +73,7 @@ const ChooseTeams = (): JSX.Element => {
     if (isGroupAdmin) return 'Equipe 2';
 
     const userIsInSecondTeam = players[1]?.team?.find(
-      (element: any) => element.id === user.id,
+      (element: any) => element.id === user?.id,
     );
 
     return userIsInSecondTeam ? 'Seu Time' : 'Time Adversário';

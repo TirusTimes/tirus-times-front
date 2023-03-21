@@ -26,7 +26,8 @@ export const Main = styled.main`
   padding: 4rem;
   border-radius: 1rem;
   margin: 0 auto;
-  min-width: 520px;
+  width: 100%;
+  max-width: 37.5rem;
   box-shadow: 4px 4px 16px 1px #aaaaaa;
 
   form {

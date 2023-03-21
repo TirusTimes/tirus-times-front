@@ -31,7 +31,7 @@ const GroupDetails = (): JSX.Element => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const user = JSON.parse(String(localStorage.getItem('user')));
-  const isGroupAdmin = group?.adminID === user.id;
+  const isGroupAdmin = group?.adminID === user?.id;
 
   useEffect(() => {
     axios
@@ -70,7 +70,7 @@ const GroupDetails = (): JSX.Element => {
         setIsLoading(true);
 
         const response = await axios.post(
-          `/api/group/${groupID}/user/${user.id}`,
+          `/api/group/${groupID}/user/${user?.id}`,
         );
 
         if (response.data) {

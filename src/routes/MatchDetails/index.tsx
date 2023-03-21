@@ -39,7 +39,7 @@ const MatchDetails = (): JSX.Element => {
   const [isLoading, setIsLoading] = useState(false);
 
   const user = JSON.parse(String(localStorage.getItem('user')));
-  const isGroupAdmin = group?.adminID === user.id;
+  const isGroupAdmin = group?.adminID === user?.id;
 
   const handleEnter = async () => {
     try {
@@ -47,7 +47,7 @@ const MatchDetails = (): JSX.Element => {
         setIsLoading(true);
 
         const response = await axios.post(
-          `/api/match/${matchID}/user/${user.id}`,
+          `/api/match/${matchID}/user/${user?.id}`,
         );
 
         if (response.data) {

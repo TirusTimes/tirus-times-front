@@ -37,7 +37,7 @@ const NewMatch = (): JSX.Element => {
   });
   const [isLoading, setIsLoading] = useState(false);
 
-  const adminID = JSON.parse(String(localStorage.getItem('user'))).id;
+  const adminID = JSON.parse(String(localStorage.getItem('user')))?.id;
 
   useEffect(() => {
     axios
