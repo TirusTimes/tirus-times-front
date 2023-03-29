@@ -119,7 +119,11 @@ const GroupDetails = (): JSX.Element => {
                   </button>
                 </Link>
               ) : (
-                <button type="button" onClick={handleAskInvite}>
+                <button
+                  type="button"
+                  onClick={handleAskInvite}
+                  disabled={isLoading}
+                >
                   Solicitar <br />
                   entrada
                 </button>
