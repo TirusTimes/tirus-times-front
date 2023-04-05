@@ -6,4 +6,5 @@ export const setupAxios = (): void => {
   setupInterceptorsTo(axios);
 
   axios.defaults.baseURL = 'https://tirus-times-back-hf1g.vercel.app/';
+  // axios.defaults.baseURL = 'https://tirus-times-back.onrender.com/';
 };
