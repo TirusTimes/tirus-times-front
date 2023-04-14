@@ -1,27 +1,19 @@
 import type { ChangeEvent } from 'react';
 import { useState, useCallback, useEffect } from 'react';
-
 import axios from 'axios';
-
 import type { AxiosError } from 'axios';
-
 import { Fab } from '@mui/material';
-
 import AddIcon from '@mui/icons-material/Add';
-
 import { useSnackbar } from 'notistack';
-
 import { Link } from 'react-router-dom';
 
 import { useModal } from 'hooks/useModal';
 
 import { Background } from 'components/Background';
-
 import NavBar from 'components/NavBar';
+import GroupForm from './GroupForm';
 
 import styles, { Main } from './styles';
-
-import GroupForm from './GroupForm';
 
 const Constants = {
   first: 5,
