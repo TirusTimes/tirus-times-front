@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 
 import axios from 'axios';
 
@@ -7,6 +7,8 @@ import type { AxiosError } from 'axios';
 import { useSnackbar } from 'notistack';
 
 import { Link, useParams } from 'react-router-dom';
+
+import useSWR from 'swr';
 
 import { Background } from 'components/Background';
 
@@ -19,7 +21,7 @@ const Evaluate = (): JSX.Element => {
   const { enqueueSnackbar } = useSnackbar();
   const [users, setUsers] = useState<any[]>([]);
 
-  useEffect(() => {
+  const fetcherEvalutation = useCallback(() => {
     axios
       .get(`/api/groups/${groupID}/users`)
       .then(response => {
@@ -31,9 +33,9 @@ const Evaluate = (): JSX.Element => {
           variant: 'error',
         });
       });
+  }, [enqueueSnackbar, groupID]);
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  useSWR(`/api/groups/${groupID}/users`, fetcherEvalutation);
 
   return (
     <>

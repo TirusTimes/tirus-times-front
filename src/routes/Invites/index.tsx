@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 import axios from 'axios';
 
@@ -7,6 +7,8 @@ import type { AxiosError } from 'axios';
 import { useSnackbar } from 'notistack';
 
 import { useParams } from 'react-router-dom';
+
+import useSWR from 'swr';
 
 import { Background } from 'components/Background';
 
@@ -31,7 +33,7 @@ const Invites = (): JSX.Element => {
 
   const user = JSON.parse(String(localStorage.getItem('user')));
 
-  useEffect(() => {
+  const fetcherGroup = useCallback(() => {
     axios
       .get(`/api/groups/${groupID}`)
       .then(response => {
@@ -43,7 +45,9 @@ const Invites = (): JSX.Element => {
           variant: 'error',
         });
       });
+  }, [enqueueSnackbar, groupID]);
 
+  const fetcherInvites = useCallback(() => {
     axios
       .get(`/api/group/${groupID}/owner/${user?.id}`)
       .then(response => {
@@ -55,9 +59,13 @@ const Invites = (): JSX.Element => {
           variant: 'error',
         });
       });
+  }, [enqueueSnackbar, groupID, user?.id]);
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  useSWR(`/api/groups/${groupID}`, fetcherGroup);
+  useSWR(
+    user ? `/api/group/${groupID}/owner/${user?.id}` : null,
+    fetcherInvites,
+  );
 
   useEffect(() => {
     requests?.forEach((req: any) => {

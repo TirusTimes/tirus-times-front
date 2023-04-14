@@ -1,5 +1,5 @@
 import type { ChangeEvent } from 'react';
-import { useState, useEffect } from 'react';
+import { useCallback, useState } from 'react';
 
 import axios from 'axios';
 
@@ -8,6 +8,8 @@ import type { AxiosError } from 'axios';
 import { useSnackbar } from 'notistack';
 
 import { useNavigate, useParams } from 'react-router-dom';
+
+import useSWR from 'swr';
 
 import { Background } from 'components/Background';
 
@@ -44,7 +46,7 @@ const EditMatch = (): JSX.Element => {
 
   const adminID = JSON.parse(String(localStorage.getItem('user')))?.id;
 
-  useEffect(() => {
+  const fetcherGroups = useCallback(() => {
     axios
       .get(`/api/groups/${groupID}`)
       .then(response => {
@@ -56,7 +58,9 @@ const EditMatch = (): JSX.Element => {
           variant: 'error',
         });
       });
+  }, [enqueueSnackbar, groupID]);
 
+  const fetcherPlayers = useCallback(() => {
     axios
       .get(`/api/match/${matchID}`)
       .then(response => {
@@ -68,8 +72,11 @@ const EditMatch = (): JSX.Element => {
           variant: 'error',
         });
       });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [enqueueSnackbar, matchID]);
+
+  useSWR(`/api/groups/${groupID}`, fetcherGroups);
+
+  useSWR(`/api/match/${matchID}`, fetcherPlayers);
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;

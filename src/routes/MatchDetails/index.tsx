@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 
 import axios from 'axios';
 
@@ -7,6 +7,8 @@ import type { AxiosError } from 'axios';
 import { useSnackbar } from 'notistack';
 
 import { Link, useParams } from 'react-router-dom';
+
+import useSWR from 'swr';
 
 import { Background } from 'components/Background';
 
@@ -93,7 +95,7 @@ const MatchDetails = (): JSX.Element => {
     }
   };
 
-  useEffect(() => {
+  const fetcherGroup = useCallback(() => {
     axios
       .get(`/api/groups/${groupID}`)
       .then(response => {
@@ -105,7 +107,8 @@ const MatchDetails = (): JSX.Element => {
           variant: 'error',
         });
       });
-
+  }, [enqueueSnackbar, groupID]);
+  const fetcherMatch = useCallback(() => {
     axios
       .get(`/api/match/${matchID}`)
       .then(response => {
@@ -117,7 +120,8 @@ const MatchDetails = (): JSX.Element => {
           variant: 'error',
         });
       });
-
+  }, [enqueueSnackbar, matchID]);
+  const fetcherUsers = useCallback(() => {
     axios
       .get(`/api/groups/${groupID}/users`)
       .then(response => {
@@ -129,9 +133,11 @@ const MatchDetails = (): JSX.Element => {
           variant: 'error',
         });
       });
+  }, [enqueueSnackbar, groupID]);
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  useSWR(`/api/groups/${groupID}`, fetcherGroup);
+  useSWR(`/api/match/${matchID}`, fetcherMatch);
+  useSWR(`/api/groups/${groupID}/users`, fetcherUsers);
 
   const statuses = {
     OPEN: 'Aberto',
