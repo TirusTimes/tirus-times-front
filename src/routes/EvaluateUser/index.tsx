@@ -1,5 +1,5 @@
 import type { ChangeEvent } from 'react';
-import { useState, useEffect } from 'react';
+import { useCallback, useState } from 'react';
 
 import axios from 'axios';
 
@@ -8,6 +8,8 @@ import type { AxiosError } from 'axios';
 import { useSnackbar } from 'notistack';
 
 import { useParams } from 'react-router-dom';
+
+import useSWR from 'swr';
 
 import { Background } from 'components/Background';
 
@@ -22,7 +24,7 @@ const EvaluateUser = (): JSX.Element => {
   const [grade, setGrade] = useState<number | undefined>(undefined);
   const [player, setPlayer] = useState<any>();
 
-  useEffect(() => {
+  const fetcherUser = useCallback(() => {
     axios
       .get(`/api/users/${userID}`)
       .then(response => {
@@ -34,9 +36,9 @@ const EvaluateUser = (): JSX.Element => {
           variant: 'error',
         });
       });
+  }, [enqueueSnackbar, userID]);
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  useSWR(`/api/users/${userID}`, fetcherUser);
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     setGrade(Number(event.target.value));

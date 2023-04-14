@@ -1,6 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 
 import axios from 'axios';
+
+import useSWR from 'swr';
 
 import type { AxiosError } from 'axios';
 
@@ -19,7 +21,7 @@ const Profile = (): JSX.Element => {
 
   const localUser = JSON.parse(String(localStorage.getItem('user')));
 
-  useEffect(() => {
+  const fetcherUser = useCallback(() => {
     axios
       .get(`/api/users/${localUser?.id}`)
       .then(response => {
@@ -31,8 +33,9 @@ const Profile = (): JSX.Element => {
           variant: 'error',
         });
       });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [enqueueSnackbar, localUser?.id]);
+
+  useSWR(localUser ? `/api/users/${localUser?.id}` : null, fetcherUser);
 
   return (
     <>

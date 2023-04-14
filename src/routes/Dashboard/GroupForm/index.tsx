@@ -24,7 +24,6 @@ interface GroupFormProps {
   onClose: () => void;
   groupFormState?: { name: string; id: number };
   setGroupFormState: (state: { name: string; id: number } | undefined) => void;
-  setRefetch: () => void;
   handleClearFilter: () => void;
 }
 
@@ -48,7 +47,6 @@ const GroupForm = ({
   groupFormState,
   setGroupFormState,
   handleClearFilter,
-  setRefetch,
 }: GroupFormProps): JSX.Element => {
   const { enqueueSnackbar } = useSnackbar();
   const [formFields, setFormFields] = useState<{ name: string }>(initialState);
@@ -84,7 +82,6 @@ const GroupForm = ({
           enqueueSnackbar('Grupo criado com sucesso', {
             variant: 'success',
           });
-          setRefetch();
         })
         .catch(() => {
           enqueueSnackbar('Ocorreu um erro ao criar o grupo', {
@@ -99,7 +96,6 @@ const GroupForm = ({
             variant: 'success',
           });
           handleClearFilter();
-          setRefetch();
         })
         .catch(() => {
           enqueueSnackbar('Ocorreu um erro ao atualizar o grupo', {
@@ -114,7 +110,6 @@ const GroupForm = ({
     groupFormState,
     handleClose,
     handleClearFilter,
-    setRefetch,
   ]);
 
   return (

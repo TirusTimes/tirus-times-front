@@ -1,5 +1,5 @@
 import type { ChangeEvent } from 'react';
-import { useState, useEffect } from 'react';
+import { useCallback, useState } from 'react';
 
 import axios from 'axios';
 
@@ -8,6 +8,8 @@ import type { AxiosError } from 'axios';
 import { useSnackbar } from 'notistack';
 
 import { useNavigate, useParams } from 'react-router-dom';
+
+import useSWR from 'swr';
 
 import { Background } from 'components/Background';
 
@@ -39,7 +41,7 @@ const NewMatch = (): JSX.Element => {
 
   const adminID = JSON.parse(String(localStorage.getItem('user')))?.id;
 
-  useEffect(() => {
+  const fetcherGroup = useCallback(() => {
     axios
       .get(`/api/groups/${groupID}`)
       .then(response => {
@@ -51,8 +53,9 @@ const NewMatch = (): JSX.Element => {
           variant: 'error',
         });
       });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [enqueueSnackbar, groupID]);
+
+  useSWR(`/api/groups/${groupID}`, fetcherGroup);
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;

@@ -1,7 +1,9 @@
 import type { ChangeEvent } from 'react';
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 
 import axios from 'axios';
+
+import useSWR from 'swr';
 
 import type { AxiosError } from 'axios';
 
@@ -44,8 +46,6 @@ const Dashboard = (): JSX.Element => {
 
   const { isOpen, handleOpen, handleClose } = useModal();
   const { enqueueSnackbar } = useSnackbar();
-  const [refetch, setRefetch] = useState(false);
-
   const [groups, setGroups] = useState<GroupsInterface[] | undefined>(
     undefined,
   );
@@ -55,7 +55,7 @@ const Dashboard = (): JSX.Element => {
     {} as GroupForm | undefined,
   );
 
-  useEffect(() => {
+  const fetcherGroups = useCallback(() => {
     axios
       .get('/api/groups')
       .then(response => {
@@ -68,8 +68,9 @@ const Dashboard = (): JSX.Element => {
           variant: 'error',
         });
       });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [refetch]);
+  }, [enqueueSnackbar]);
+
+  useSWR(`/api/groups`, fetcherGroups, { refreshInterval: 3000 });
 
   const handleAddOpen = useCallback(() => {
     setGroupFormState(undefined);
@@ -89,10 +90,6 @@ const Dashboard = (): JSX.Element => {
 
   const handleClear = useCallback((): void => {
     setFilter(Constants.initialFilter);
-  }, []);
-
-  const handleRefetch = useCallback(() => {
-    setRefetch(prev => !prev);
   }, []);
 
   const setGroupFormStateHandler = useCallback(
@@ -139,7 +136,6 @@ const Dashboard = (): JSX.Element => {
           onClose={handleClose}
           groupFormState={groupFormState}
           setGroupFormState={setGroupFormStateHandler}
-          setRefetch={handleRefetch}
           handleClearFilter={handleClear}
         />
       </Main>

@@ -1,12 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 
 import axios from 'axios';
+
+import useSWR from 'swr';
 
 import type { AxiosError } from 'axios';
 
 import { useSnackbar } from 'notistack';
 
 import { useParams } from 'react-router-dom';
+
+import CircularProgress from '@mui/material/CircularProgress/CircularProgress';
 
 import { Background } from 'components/Background';
 
@@ -31,7 +35,7 @@ const ChooseTeams = (): JSX.Element => {
   const user = JSON.parse(String(localStorage.getItem('user')));
   const isGroupAdmin = group?.adminID === user?.id;
 
-  useEffect(() => {
+  const fetcherGroups = useCallback(() => {
     axios
       .get(`/api/groups/${groupID}`)
       .then(response => {
@@ -43,7 +47,9 @@ const ChooseTeams = (): JSX.Element => {
           variant: 'error',
         });
       });
+  }, [enqueueSnackbar, groupID]);
 
+  const fetcherPlayers = useCallback(() => {
     axios
       .get(`/api/match/choose/${matchID}`)
       .then(response => {
@@ -55,29 +61,36 @@ const ChooseTeams = (): JSX.Element => {
           variant: 'error',
         });
       });
+  }, [enqueueSnackbar, matchID]);
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const { isLoading: isGroupsLoading } = useSWR(
+    `/api/groups/${groupID}`,
+    fetcherGroups,
+  );
+  const { isLoading: isPlayerssLoading } = useSWR(
+    `/api/match/choose/${matchID}`,
+    fetcherPlayers,
+  );
 
-  const team1Text = () => {
-    if (isGroupAdmin) return 'Equipe 1';
+  const team1Text = useMemo(() => {
+    if (isGroupAdmin || !players.length) return 'Equipe 1';
 
     const userIsInFirstTeam = players[0]?.team?.find(
       (element: any) => element.id === user?.id,
     );
 
     return userIsInFirstTeam ? 'Seu Time' : 'Time Adversário';
-  };
+  }, [isGroupAdmin, players, user?.id]);
 
-  const team2Text = () => {
-    if (isGroupAdmin) return 'Equipe 2';
+  const team2Text = useMemo(() => {
+    if (isGroupAdmin || !players.length) return 'Equipe 2';
 
     const userIsInSecondTeam = players[1]?.team?.find(
       (element: any) => element.id === user?.id,
     );
 
     return userIsInSecondTeam ? 'Seu Time' : 'Time Adversário';
-  };
+  }, [isGroupAdmin, players, user?.id]);
 
   const handleStart = async () => {
     try {
@@ -112,24 +125,28 @@ const ChooseTeams = (): JSX.Element => {
       <NavBar />
       <Main>
         <div className="box">
-          <div className="content">
-            <div>
-              <h3>{team1Text()}</h3>
-              <div className="description">
-                {players[0]?.team?.map((item: any) => (
-                  <span key={item.id}>{item.name}</span>
-                ))}
+          {isGroupsLoading || isPlayerssLoading ? (
+            <CircularProgress color="primary" size={100} />
+          ) : (
+            <div className="content">
+              <div>
+                <h3>{team1Text}</h3>
+                <div className="description">
+                  {players[0]?.team?.map((item: any) => (
+                    <span key={item.id}>{item.name}</span>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <h3>{team2Text}</h3>
+                <div className="description">
+                  {players[1]?.team?.map((item: any) => (
+                    <span key={item.id}>{item.name}</span>
+                  ))}
+                </div>
               </div>
             </div>
-            <div>
-              <h3>{team2Text()}</h3>
-              <div className="description">
-                {players[1]?.team?.map((item: any) => (
-                  <span key={item.id}>{item.name}</span>
-                ))}
-              </div>
-            </div>
-          </div>
+          )}
           <StyledButton
             type="button"
             disabled={isLoading}
